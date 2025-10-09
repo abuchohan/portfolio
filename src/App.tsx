@@ -1,12 +1,12 @@
 import './App.css'
 import Header from './components/Header/Header'
-import avatar from './assets/animoji.png'
+// import avatar from './assets/animoji.png'
 
 function App() {
     return (
         <>
             <Header />
-            <div className="grid">
+            {/* <div className="grid">
                 <div
                     className="card"
                     style={{
@@ -51,7 +51,7 @@ function App() {
                         background: 'linear-gradient(135deg, #f2c94c, #f5d76e)', // deeper yellow
                     }}
                 />
-            </div>
+            </div> */}
         </>
     )
 }

@@ -66,6 +66,58 @@ const projects: Project[] = [
       "Tailwind CSS 4",
     ],
     liveUrl: "https://norma.abuchohan.co.uk",
+    imageUrl: "/norma-still.png",
+    videoUrl: "/norma-video.mp4",
+  },
+  {
+    title: "Spring Board",
+    tag: "Full Stack",
+    year: "2025",
+    role: "Full Stack Developer",
+    goal: "To eliminate the repetitive setup work that slows down every new project — by providing a production-ready monorepo foundation with auth, routing, and database wiring already in place.",
+    description:
+      "A full-stack monorepo starter template built for rapid project bootstrapping. Ships with a React client, Express server, Prisma ORM, and Turborepo orchestration — so you can skip the scaffolding and get straight to building.",
+    highlights: [
+      "Turborepo monorepo with shared TypeScript config across client and server",
+      "Pre-wired auth flow with login, session handling, and protected routes",
+      "Prisma + PostgreSQL integration with push-based schema management for fast iteration",
+      "Voice tagging page demonstrating media input patterns out of the box",
+    ],
+    tech: [
+      "React",
+      "TypeScript",
+      "Express",
+      "PostgreSQL",
+      "Prisma",
+      "Turborepo",
+      "pnpm Workspaces",
+      "Tailwind CSS",
+    ],
+    liveUrl: undefined,
+  },
+  {
+    title: "URL Shortener",
+    tag: "Full Stack",
+    year: "2024",
+    role: "Full Stack Developer",
+    goal: "To build a clean, fast URL shortening service with a focus on simplicity — minimal UI, instant redirects, and persistent link history.",
+    description:
+      "A full-stack URL shortening app. Paste a long URL, get a short code back, and track all your created links in a table. Built with Next.js 15 on the client and an Express API backed by PostgreSQL.",
+    highlights: [
+      "Short code generation with uniqueness enforced at the database level",
+      "Server actions for form submission with optimistic UI updates",
+      "REST API with Express handling redirect resolution and link creation",
+      "PostgreSQL via Prisma storing original URLs, short codes, and creation timestamps",
+    ],
+    tech: [
+      "Next.js 15",
+      "TypeScript",
+      "Express",
+      "PostgreSQL",
+      "Prisma",
+      "Tailwind CSS",
+    ],
+    liveUrl: undefined,
   },
   {
     title: "Arc UI",
@@ -94,43 +146,122 @@ const projects: Project[] = [
     ],
     liveUrl: "https://ui.digital-ent-int.bt.com/latest/docs/intro",
   },
-  {
-    title: "Stackmart",
-    tag: "Full Stack",
-    year: "2024",
-    role: "Full Stack Developer",
-    description:
-      "A full-stack e-commerce platform built for small-to-medium retailers. Includes a storefront, admin dashboard, real-time inventory management, and integrated Stripe checkout. Designed with performance and scalability in mind — server-side rendering for fast initial loads and a REST API with Redis caching for high-traffic product endpoints.",
-    highlights: [
-      "Built a multi-tenant admin dashboard with role-based access control",
-      "Integrated Stripe Checkout with webhook handling for order lifecycle",
-      "Achieved sub-200ms API response times via Redis caching layer",
-      "Deployed on Railway with PostgreSQL and automatic preview environments",
-    ],
-    tech: [
-      "React",
-      "TypeScript",
-      "Node.js",
-      "Express",
-      "PostgreSQL",
-      "Redis",
-      "Stripe",
-      "Tailwind CSS",
-      "Railway",
-    ],
-    liveUrl: undefined,
-  },
-  {
-    title: "Project Four",
-    tag: "Design",
-    year: "2024",
-    role: "Designer",
-    description: "Coming soon.",
-    highlights: [],
-    tech: [],
-    liveUrl: undefined,
-  },
 ];
+
+function ProjectCard({
+  project,
+  index,
+  onClick,
+}: {
+  project: Project;
+  index: number;
+  onClick: () => void;
+}) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  const handleMouseEnter = () => {
+    if (videoRef.current) {
+      videoRef.current.currentTime = 0;
+      videoRef.current.play();
+    }
+  };
+
+  const handleMouseLeave = () => {
+    setTimeout(() => {
+      if (videoRef.current) {
+        videoRef.current.pause();
+        videoRef.current.currentTime = 0;
+      }
+    }, 500);
+  };
+  return (
+    <motion.div
+      variants={projectItem}
+      whileHover={{ y: -4 }}
+      transition={{ duration: 0.35, ease: [0.25, 0.1, 0.25, 1] }}
+      className="group block cursor-pointer"
+      onClick={onClick}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
+      {/* Thumbnail */}
+      <div
+        className="relative w-full overflow-hidden rounded-sm mb-3 border border-white/[0.08]
+        transition-colors duration-500 group-hover:border-white/[0.18]"
+        style={{ aspectRatio: "16/9" }}
+      >
+        {/* Placeholder — always visible, fades out on hover when video exists */}
+        {project.imageUrl ? (
+          <img
+            src={project.imageUrl}
+            alt={project.title}
+            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ease-out
+            ${project.videoUrl ? "group-hover:opacity-0 group-hover:delay-500" : ""}`}
+          />
+        ) : (
+          <div
+            className={`absolute inset-0 bg-white/[0.03] transition-opacity duration-500 ease-out
+            ${project.videoUrl ? "group-hover:opacity-0 group-hover:delay-500" : ""}`}
+          />
+        )}
+
+        {/* Video — hidden until hover */}
+        {project.videoUrl && (
+          <video
+            ref={videoRef}
+            src={project.videoUrl}
+            muted
+            loop
+            playsInline
+            className="absolute inset-0 w-full h-full object-cover
+            opacity-0 transition-opacity duration-500 ease-out
+            group-hover:opacity-100 group-hover:delay-500 "
+          />
+        )}
+
+        {/* Overlay scrim */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
+
+        {/* Corner index */}
+        <span
+          className="absolute top-4 left-4 text-[10px] tracking-[0.3em] uppercase text-white/20
+          transition-opacity duration-300 group-hover:text-white/50 z-10"
+        >
+          {String(index + 1).padStart(2, "0")}
+        </span>
+
+        {/* Hover arrow */}
+        <div
+          className="absolute bottom-4 right-4 opacity-0 translate-y-1
+          group-hover:opacity-100 group-hover:translate-y-0
+          transition-all duration-300 ease-out z-10"
+        >
+          <div
+            className="flex items-center justify-center w-8 h-8 rounded-full
+            bg-white/10 border border-white/20 backdrop-blur-sm"
+          >
+            <ArrowUpRight className="size-3.5 text-white" />
+          </div>
+        </div>
+      </div>
+
+      {/* Card footer */}
+      <div className="flex items-center justify-between px-0.5">
+        <h3
+          className="text-[15px] font-[400] text-white/80 tracking-[-0.01em]
+          transition-colors duration-300 group-hover:text-white"
+        >
+          {project.title}
+        </h3>
+        <ArrowUpRight
+          className="size-3.5 text-white/20 -translate-x-1 opacity-0
+          group-hover:opacity-100 group-hover:translate-x-0
+          transition-all duration-300 ease-out"
+        />
+      </div>
+    </motion.div>
+  );
+}
 
 function App() {
   const [selectedProject, setSelectedProject] = useState<number | null>(null);
@@ -144,43 +275,45 @@ function App() {
     <>
       {/* ── Footer (fixed, sits behind page content) ── */}
       <footer
-        className="fixed bottom-0 left-0 right-0 z-0 bg-[#f0ede8] flex flex-col justify-between px-10 md:px-16 lg:px-20 pt-14 pb-10"
+        className="fixed bottom-0 left-0 right-0 z-0 bg-[#f0ede8] px-10 md:px-16 lg:px-20 pt-14 pb-10"
         style={{ height: "22rem" }}
       >
-        <motion.div
-          className="flex flex-col gap-4"
-          variants={container}
-          initial="hidden"
-          animate={isFooterRevealed ? "show" : "hidden"}
-        >
-          <motion.h2
-            variants={item}
-            className="text-[clamp(2.5rem,6vw,5rem)] font-[500] text-[#1a1a1a] tracking-[-0.03em] leading-[0.92]"
+        <div className="max-w-[1440px] mx-auto w-full h-full flex flex-col justify-between">
+          <motion.div
+            className="flex flex-col gap-4"
+            variants={container}
+            initial="hidden"
+            animate={isFooterRevealed ? "show" : "hidden"}
           >
-            Ready to work?
-          </motion.h2>
-          <motion.a
+            <motion.h2
+              variants={item}
+              className="text-[clamp(2.5rem,6vw,5rem)] font-[500] text-[#1a1a1a] tracking-[-0.03em] leading-[0.92]"
+            >
+              Ready to work?
+            </motion.h2>
+            <motion.a
+              variants={item}
+              href="mailto:hello@abuchohan.co.uk"
+              className="group inline-flex items-center gap-2 text-[clamp(1.5rem,3vw,2.5rem)] font-[500] tracking-[-0.02em] text-[#1a1a1a]/50 hover:text-[#1a1a1a] transition-colors duration-300 leading-none"
+            >
+              hello@abuchohan.co.uk
+              <ArrowUpRight className="size-6 md:size-8 transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" />
+            </motion.a>
+          </motion.div>
+          <motion.div
+            className="flex items-end justify-between"
             variants={item}
-            href="mailto:hello@abuchohan.co.uk"
-            className="group inline-flex items-center gap-2 text-[clamp(1.5rem,3vw,2.5rem)] font-[500] tracking-[-0.02em] text-[#1a1a1a]/50 hover:text-[#1a1a1a] transition-colors duration-300 leading-none"
+            initial="hidden"
+            animate={isFooterRevealed ? "show" : "hidden"}
           >
-            hello@abuchohan.co.uk
-            <ArrowUpRight className="size-6 md:size-8 transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" />
-          </motion.a>
-        </motion.div>
-        <motion.div
-          className="flex items-end justify-between"
-          variants={item}
-          initial="hidden"
-          animate={isFooterRevealed ? "show" : "hidden"}
-        >
-          <p className="text-[11px] tracking-[0.3em] uppercase text-[#1a1a1a]/35">
-            Abu Chohan
-          </p>
-          <p className="text-[11px] tracking-[0.3em] uppercase text-[#1a1a1a]/35">
-            © {new Date().getFullYear()}
-          </p>
-        </motion.div>
+            <p className="text-[11px] tracking-[0.3em] uppercase text-[#1a1a1a]/35">
+              Abu Chohan
+            </p>
+            <p className="text-[11px] tracking-[0.3em] uppercase text-[#1a1a1a]/35">
+              © {new Date().getFullYear()}
+            </p>
+          </motion.div>
+        </div>
       </footer>
 
       {/* ── Page content (scrolls over footer) ── */}
@@ -221,13 +354,13 @@ function App() {
 
             <motion.h1
               variants={item}
-              className="text-[12vw] font-[500] text-white tracking-[-0.03em] leading-[0.92] select-none"
+              className="text-[clamp(5rem,12vw,13rem)] font-[500] text-white tracking-[-0.03em] leading-[0.92] select-none"
             >
               Abu
             </motion.h1>
             <motion.h1
               variants={item}
-              className="text-[12vw] font-[500] text-white tracking-[-0.03em] leading-[0.92] select-none mb-6"
+              className="text-[clamp(5rem,12vw,13rem)] font-[500] text-white tracking-[-0.03em] leading-[0.92] select-none mb-6"
             >
               Chohan
             </motion.h1>
@@ -281,95 +414,46 @@ function App() {
           id="projects"
           className="bg-[#080808] px-10 md:px-16 lg:px-20 pt-24 pb-32"
         >
-          {/* Section header */}
-          <motion.div
-            className="flex items-end justify-between mb-14"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-80px" }}
-            transition={{ duration: 0.7, ease: [0.25, 0.1, 0.25, 1] }}
-          >
-            <div>
-              <p className="text-[11px] tracking-[0.35em] uppercase text-white/30 mb-3">
-                Selected Work
+          <div className="max-w-[1440px] mx-auto w-full">
+            {/* Section header */}
+            <motion.div
+              className="flex items-end justify-between mb-14"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-80px" }}
+              transition={{ duration: 0.7, ease: [0.25, 0.1, 0.25, 1] }}
+            >
+              <div>
+                <p className="text-[11px] tracking-[0.35em] uppercase text-white/30 mb-3">
+                  Selected Work
+                </p>
+                <h2 className="text-[2.5rem] md:text-[3.5rem] font-[500] text-white tracking-[-0.03em] leading-[0.92]">
+                  Projects
+                </h2>
+              </div>
+              <p className="text-[12px] tracking-[0.25em] uppercase text-white/25 hidden md:block">
+                {projects.length} works
               </p>
-              <h2 className="text-[2.5rem] md:text-[3.5rem] font-[500] text-white tracking-[-0.03em] leading-[0.92]">
-                Projects
-              </h2>
-            </div>
-            <p className="text-[12px] tracking-[0.25em] uppercase text-white/25 hidden md:block">
-              {projects.length} works
-            </p>
-          </motion.div>
+            </motion.div>
 
-          {/* Cards grid */}
-          <motion.div
-            className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5"
-            variants={projectsContainer}
-            initial="hidden"
-            whileInView="show"
-            viewport={{ once: true, margin: "-60px" }}
-          >
-            {projects.map((project, i) => (
-              <motion.div
-                key={project.title}
-                variants={projectItem}
-                className="group block cursor-pointer"
-                onClick={() => setSelectedProject(i)}
-              >
-                {/* Thumbnail */}
-                <div
-                  className="relative w-full overflow-hidden rounded-sm mb-3"
-                  style={{ aspectRatio: "16/9" }}
-                >
-                  {/* Empty placeholder */}
-                  <div
-                    className="absolute inset-0 bg-white/[0.03] border border-white/[0.08] rounded-sm
-                    transition-colors duration-500 group-hover:bg-white/[0.05] group-hover:border-white/[0.14]"
-                  />
-
-                  {/* Corner index */}
-                  <span
-                    className="absolute top-4 left-4 text-[10px] tracking-[0.3em] uppercase text-white/20
-                    transition-opacity duration-300 group-hover:text-white/40"
-                  >
-                    {String(i + 1).padStart(2, "0")}
-                  </span>
-
-                  {/* Hover arrow */}
-                  <div
-                    className="absolute bottom-4 right-4 opacity-0 translate-y-1
-                    group-hover:opacity-100 group-hover:translate-y-0
-                    transition-all duration-300 ease-out"
-                  >
-                    <div
-                      className="flex items-center justify-center w-8 h-8 rounded-full
-                      bg-white/10 border border-white/20 backdrop-blur-sm"
-                    >
-                      <ArrowUpRight className="size-3.5 text-white" />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Card footer */}
-                <div className="flex items-center justify-between px-0.5">
-                  <div className="flex items-center gap-3">
-                    <h3
-                      className="text-[15px] font-[400] text-white/80 tracking-[-0.01em]
-                      transition-colors duration-300 group-hover:text-white"
-                    >
-                      {project.title}
-                    </h3>
-                  </div>
-                  <ArrowUpRight
-                    className="size-3.5 text-white/20 -translate-x-1 opacity-0
-                    group-hover:opacity-100 group-hover:translate-x-0
-                    transition-all duration-300 ease-out"
-                  />
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
+            {/* Cards grid */}
+            <motion.div
+              className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5"
+              variants={projectsContainer}
+              initial="hidden"
+              whileInView="show"
+              viewport={{ once: true, margin: "-60px" }}
+            >
+              {projects.map((project, i) => (
+                <ProjectCard
+                  key={project.title}
+                  project={project}
+                  index={i}
+                  onClick={() => setSelectedProject(i)}
+                />
+              ))}
+            </motion.div>
+          </div>
         </section>
       </div>
 

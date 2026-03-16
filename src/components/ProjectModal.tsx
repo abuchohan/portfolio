@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { X, ArrowUpRight } from "lucide-react";
 
@@ -12,6 +12,8 @@ export type Project = {
   highlights: string[];
   tech: string[];
   liveUrl?: string;
+  imageUrl?: string;
+  videoUrl?: string;
 };
 
 interface ProjectModalProps {
@@ -25,6 +27,8 @@ export default function ProjectModal({
   index,
   onClose,
 }: ProjectModalProps) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+
   useEffect(() => {
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
@@ -73,10 +77,35 @@ export default function ProjectModal({
         >
           {/* Hero zone */}
           <div
-            className="relative w-full bg-white/[0.03] border-b border-white/[0.06] rounded-t-2xl"
+            className="relative w-full bg-white/[0.03] border-b border-white/[0.06] rounded-t-2xl overflow-hidden"
             style={{ aspectRatio: "16/9" }}
           >
-            <span className="absolute top-4 left-4 text-[10px] tracking-[0.3em] uppercase text-white/20">
+            {/* Still image */}
+            {project.imageUrl && (
+              <img
+                src={project.imageUrl}
+                alt={project.title}
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+            )}
+
+            {/* Video — autoplays in the modal */}
+            {project.videoUrl && (
+              <video
+                ref={videoRef}
+                src={project.videoUrl}
+                autoPlay
+                muted
+                loop
+                playsInline
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+            )}
+
+            {/* Scrim */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent pointer-events-none" />
+
+            <span className="absolute top-4 left-4 text-[10px] tracking-[0.3em] uppercase text-white/40 z-10">
               {String(index + 1).padStart(2, "0")}
             </span>
           </div>

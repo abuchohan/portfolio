@@ -1,0 +1,6 @@
+{
+  "permissions": {
+    "allow": ["mcp__shadcn", "mcp__plawirght"]
+  },
+  "enabledMcpjsonServers": ["shadcn"]
+}

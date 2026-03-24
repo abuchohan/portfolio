@@ -66,8 +66,7 @@ const projects: Project[] = [
       "Tailwind CSS 4",
     ],
     liveUrl: "https://norma.abuchohan.co.uk",
-    imageUrl: "/norma-still.png",
-    videoUrl: "/norma-video.mp4",
+    imageUrl: "/norma.png",
   },
   {
     title: "Spring Board",
@@ -76,24 +75,28 @@ const projects: Project[] = [
     role: "Full Stack Developer",
     goal: "To eliminate the repetitive setup work that slows down every new project — by providing a production-ready monorepo foundation with auth, routing, and database wiring already in place.",
     description:
-      "A full-stack monorepo starter template built for rapid project bootstrapping. Ships with a React client, Express server, Prisma ORM, and Turborepo orchestration — so you can skip the scaffolding and get straight to building.",
+      "A full-stack monorepo starter template for rapid project bootstrapping. Ships with session-based authentication, password reset via email, a protected dashboard, and a React frontend — so you skip the scaffolding and go straight to building.",
     highlights: [
-      "Turborepo monorepo with shared TypeScript config across client and server",
-      "Pre-wired auth flow with login, session handling, and protected routes",
-      "Prisma + PostgreSQL integration with push-based schema management for fast iteration",
-      "Voice tagging page demonstrating media input patterns out of the box",
+      "Turborepo monorepo with shared TypeScript config across React client and Express server",
+      "Session-based auth with login, registration, logout, and 15-minute password-reset tokens via email",
+      "Protected dashboard and profile pages with Redux auth state and route guards",
+      "Prisma + PostgreSQL with User, Session, and PasswordReset models",
     ],
     tech: [
-      "React",
+      "React 19",
       "TypeScript",
-      "Express",
+      "Express 5",
       "PostgreSQL",
       "Prisma",
       "Turborepo",
       "pnpm Workspaces",
-      "Tailwind CSS",
+      "Redux Toolkit",
+      "Tailwind CSS 4",
+      "React Router 7",
+      "Zod",
     ],
-    liveUrl: undefined,
+    liveUrl: "https://github.com/abuchohan/spring-board",
+    imageUrl: "/springboard.png",
   },
   {
     title: "URL Shortener",
@@ -118,6 +121,7 @@ const projects: Project[] = [
       "Tailwind CSS",
     ],
     liveUrl: undefined,
+    imageUrl: "/url-shortner.png",
   },
   {
     title: "Arc UI",
@@ -145,6 +149,7 @@ const projects: Project[] = [
       "Docusaurus",
     ],
     liveUrl: "https://ui.digital-ent-int.bt.com/latest/docs/intro",
+    imageUrl: "/arc.png",
   },
 ];
 
@@ -293,10 +298,10 @@ function App() {
             </motion.h2>
             <motion.a
               variants={item}
-              href="mailto:hello@abuchohan.co.uk"
+              href="mailto:abuchohan@hotmail.co.uk"
               className="group inline-flex items-center gap-2 text-[clamp(1.5rem,3vw,2.5rem)] font-[500] tracking-[-0.02em] text-[#1a1a1a]/50 hover:text-[#1a1a1a] transition-colors duration-300 leading-none"
             >
-              hello@abuchohan.co.uk
+              abuchohan@hotmail.co.uk
               <ArrowUpRight className="size-6 md:size-8 transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" />
             </motion.a>
           </motion.div>

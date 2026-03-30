@@ -4,6 +4,7 @@ import { motion, useInView, AnimatePresence } from "motion/react";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 import Silk from "./components/Silk";
+import AskNormaLogo from "./components/AskNormaLogo";
 import ProjectModal, { type Project } from "./components/ProjectModal";
 
 const container = {
@@ -40,7 +41,7 @@ const projectItem = {
 
 const projects: Project[] = [
   {
-    title: "Norma AI",
+    title: "askNorma.app",
     tag: "Full Stack",
     year: "2024",
     role: "Full Stack Developer",
@@ -48,7 +49,7 @@ const projects: Project[] = [
     description:
       "A full-stack app that turns voice recordings into organized tasks. Record a note, and an AI pipeline transcribes it with Whisper, analyzes it with GPT, and breaks it down into tasks and subtasks — all stored and ready to act on.",
     highlights: [
-      "Async AI pipeline: S3 upload → Whisper transcription → GPT task extraction",
+      "Async AI pipeline: audio buffer → Whisper transcription → GPT task extraction",
       "Real-time status tracking from Pending through Processing to Done",
       "Session-based auth with httpOnly cookies and 3-day session persistence",
       "Monorepo architecture with Turborepo across React client and Express server",
@@ -61,12 +62,11 @@ const projects: Project[] = [
       "Prisma",
       "OpenAI Whisper",
       "GPT",
-      "AWS S3",
       "Redux Toolkit",
       "Tailwind CSS 4",
     ],
-    liveUrl: "https://norma.abuchohan.co.uk",
-    imageUrl: "/norma.png",
+    liveUrl: "https://asknorma.app",
+    logoText: "askNorma",
   },
   {
     title: "Spring Board",
@@ -205,9 +205,15 @@ function ProjectCard({
           />
         ) : (
           <div
-            className={`absolute inset-0 bg-white/[0.03] transition-opacity duration-500 ease-out
+            className={`absolute inset-0 bg-white/[0.03] flex items-center justify-center transition-opacity duration-500 ease-out
             ${project.videoUrl ? "group-hover:opacity-0 group-hover:delay-500" : ""}`}
-          />
+          >
+            {project.logoText && (
+              <AskNormaLogo
+                className="w-[55%] text-white/70"
+              />
+            )}
+          </div>
         )}
 
         {/* Video — hidden until hover */}

@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { X, ArrowUpRight } from "lucide-react";
+import AskNormaLogo from "./AskNormaLogo";
 
 export type Project = {
   title: string;
@@ -13,6 +14,7 @@ export type Project = {
   tech: string[];
   liveUrl?: string;
   imageUrl?: string;
+  logoText?: string;
   videoUrl?: string;
 };
 
@@ -77,7 +79,7 @@ export default function ProjectModal({
         >
           {/* Hero zone */}
           <div
-            className="relative w-full bg-white/[0.03] border-b border-white/[0.06] rounded-t-2xl overflow-hidden"
+            className="relative w-full bg-white/[0.03] border-b border-white/[0.06] rounded-t-2xl overflow-hidden flex items-center justify-center"
             style={{ aspectRatio: "16/9" }}
           >
             {/* Still image */}
@@ -87,6 +89,11 @@ export default function ProjectModal({
                 alt={project.title}
                 className="absolute inset-0 w-full h-full object-cover"
               />
+            )}
+
+            {/* Logo — shown when no image or video */}
+            {!project.imageUrl && !project.videoUrl && project.logoText && (
+              <AskNormaLogo className="w-[40%] text-white/60" />
             )}
 
             {/* Video — autoplays in the modal */}

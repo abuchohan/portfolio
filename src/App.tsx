@@ -50,7 +50,7 @@ function App() {
           <h1>New website is<br />being <span className="headline-accent">cooked up<svg viewBox="0 0 370 17" fill="none" aria-hidden="true"><path d="M4 11C85 2 217 2 365 8M39 14C129 7 249 7 329 12" stroke="currentColor" strokeWidth="3" strokeLinecap="round" /></svg></span><span className="headline-period">.</span></h1>
           <p>A little coding. A little cooking. Something good takes time.<br className="desktop-break" /> Make yourself at home while I put the finishing touches on.</p>
         </div>
-        <section className="room-section" aria-label="An isometric room with Abu alternating between coding at his desk and cooking at the stove">
+        <section className="room-section" aria-label="An isometric room with Abu alternating between coding at his desk and cooking at the stove, while his fluffy Neva Masquerade cat with an orange nose naps on the rug">
           <div className="scene-decoration decoration-left" aria-hidden="true"><span>THE WORK IN PROGRESS</span><svg viewBox="0 0 58 66" fill="none"><path d="M5 4C3 26 22 39 48 42M38 30L50 43L35 49" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg></div>
           <div className="scene-decoration decoration-right" aria-hidden="true"><span>100% HOMEMADE</span><svg width="26" height="26" viewBox="0 0 26 26" fill="none"><path d="M13 2v22M2 13h22M5 5l16 16M5 21L21 5" stroke="currentColor" strokeWidth="1.5" /></svg></div>
           <div className="room-canvas"><SceneBoundary><Suspense fallback={<div className="scene-loading"><span className="status-dot" /> Setting the table…</div>}><CookRoom activity={activity} paused={paused} reducedMotion={reducedMotion} /></Suspense></SceneBoundary></div>

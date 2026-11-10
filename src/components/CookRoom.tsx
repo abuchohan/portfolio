@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import type { Activity } from '../App';
+import VoxelCat from './VoxelCat';
 
 type Vec3 = [number, number, number];
 type SceneProps = { activity: Activity; paused: boolean; reducedMotion: boolean };
@@ -219,6 +220,7 @@ function Scene(props: SceneProps) {
     <directionalLight position={[5, 4, -3]} intensity={.7} color="#e2eadb" />
     <group position={[0, -.1, 0]}>
       <RoomShell /><Desk /><Kitchen activity={props.activity} /><Avatar {...props} /><Steam {...props} />
+      <VoxelCat paused={props.paused} reducedMotion={props.reducedMotion} />
       <Plant at={[-2.67, .04, 1.48]} scale={1.3} pot="#c48968" />
       <group position={[2.7, 0, 1.32]}><Block at={[0, .24, 0]} size={[.49, .46, .49]} color="#c9b58d" /><Block at={[0, .49, 0]} size={[.52, .05, .52]} color="#dfcaa1" /><Plant at={[0, .52, 0]} scale={.6} pot="#eee1c7" /></group>
       <Block at={[-2.6, .22, -1.91]} size={[.26, .42, .31]} color="#899477" /><Block at={[-2.3, .18, -1.91]} size={[.21, .34, .31]} color="#c39370" />

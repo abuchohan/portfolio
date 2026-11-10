@@ -1,490 +1,72 @@
-import "./App.css";
-import { useRef, useState } from "react";
-import { motion, useInView, AnimatePresence } from "motion/react";
-import { Button } from "@/components/ui/button";
-import { ArrowRight, ArrowUpRight } from "lucide-react";
-import Silk from "./components/Silk";
-import AskNormaLogo from "./components/AskNormaLogo";
-import ProjectModal, { type Project } from "./components/ProjectModal";
+import { Component, lazy, Suspense, useEffect, useState, type ReactNode } from 'react';
+import { ArrowUpRight, ChefHat, Code2, Github, Pause, Play } from 'lucide-react';
+import './App.css';
 
-const container = {
-  hidden: {},
-  show: {
-    transition: { staggerChildren: 0.12, delayChildren: 0.2 },
-  },
-};
+const CookRoom = lazy(() => import('./components/CookRoom'));
+export type Activity = 'coding' | 'cooking';
+const CYCLE_LENGTH = 12000;
 
-const item = {
-  hidden: { opacity: 0, y: 28 },
-  show: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.75, ease: [0.25, 0.1, 0.25, 1] as const },
-  },
-};
-
-const projectsContainer = {
-  hidden: {},
-  show: {
-    transition: { staggerChildren: 0.1, delayChildren: 0.05 },
-  },
-};
-
-const projectItem = {
-  hidden: { opacity: 0, y: 40 },
-  show: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.8, ease: [0.25, 0.1, 0.25, 1] as const },
-  },
-};
-
-const projects: Project[] = [
-  {
-    title: "askNorma.app",
-    tag: "Full Stack",
-    year: "2024",
-    role: "Full Stack Developer",
-    goal: "To reduce the friction between capturing ideas and acting on them — by turning raw voice notes into structured, actionable tasks automatically using AI.",
-    description:
-      "A full-stack app that turns voice recordings into organized tasks. Record a note, and an AI pipeline transcribes it with Whisper, analyzes it with GPT, and breaks it down into tasks and subtasks — all stored and ready to act on.",
-    highlights: [
-      "Async AI pipeline: audio buffer → Whisper transcription → GPT task extraction",
-      "Real-time status tracking from Pending through Processing to Done",
-      "Session-based auth with httpOnly cookies and 3-day session persistence",
-      "Monorepo architecture with Turborepo across React client and Express server",
-    ],
-    tech: [
-      "React 19",
-      "TypeScript",
-      "Express 5",
-      "PostgreSQL",
-      "Prisma",
-      "OpenAI Whisper",
-      "GPT",
-      "Redux Toolkit",
-      "Tailwind CSS 4",
-    ],
-    liveUrl: "https://asknorma.app",
-    logoText: "askNorma",
-  },
-  {
-    title: "Spring Board",
-    tag: "Full Stack",
-    year: "2025",
-    role: "Full Stack Developer",
-    goal: "To eliminate the repetitive setup work that slows down every new project — by providing a production-ready monorepo foundation with auth, routing, and database wiring already in place.",
-    description:
-      "A full-stack monorepo starter template for rapid project bootstrapping. Ships with session-based authentication, password reset via email, a protected dashboard, and a React frontend — so you skip the scaffolding and go straight to building.",
-    highlights: [
-      "Turborepo monorepo with shared TypeScript config across React client and Express server",
-      "Session-based auth with login, registration, logout, and 15-minute password-reset tokens via email",
-      "Protected dashboard and profile pages with Redux auth state and route guards",
-      "Prisma + PostgreSQL with User, Session, and PasswordReset models",
-    ],
-    tech: [
-      "React 19",
-      "TypeScript",
-      "Express 5",
-      "PostgreSQL",
-      "Prisma",
-      "Turborepo",
-      "pnpm Workspaces",
-      "Redux Toolkit",
-      "Tailwind CSS 4",
-      "React Router 7",
-      "Zod",
-    ],
-    liveUrl: "https://github.com/abuchohan/spring-board",
-    imageUrl: "/springboard.png",
-  },
-  {
-    title: "URL Shortener",
-    tag: "Full Stack",
-    year: "2024",
-    role: "Full Stack Developer",
-    goal: "To build a clean, fast URL shortening service with a focus on simplicity — minimal UI, instant redirects, and persistent link history.",
-    description:
-      "A full-stack URL shortening app. Paste a long URL, get a short code back, and track all your created links in a table. Built with Next.js 15 on the client and an Express API backed by PostgreSQL.",
-    highlights: [
-      "Short code generation with uniqueness enforced at the database level",
-      "Server actions for form submission with optimistic UI updates",
-      "REST API with Express handling redirect resolution and link creation",
-      "PostgreSQL via Prisma storing original URLs, short codes, and creation timestamps",
-    ],
-    tech: [
-      "Next.js 15",
-      "TypeScript",
-      "Express",
-      "PostgreSQL",
-      "Prisma",
-      "Tailwind CSS",
-    ],
-    liveUrl: undefined,
-    imageUrl: "/url-shortner.png",
-  },
-  {
-    title: "Arc UI",
-    tag: "Design System",
-    year: "2025",
-    role: "Senior Software Engineer",
-    goal: "To establish a single source of truth for BT Enterprise's design language — enabling product teams across BT, BT Business, and EE to build consistently branded, accessible web interfaces without reinventing components from scratch.",
-    description:
-      "The UI system powering BT Enterprise digital products. Arc is a collection of React components and design tokens that give teams a shared foundation for building high-quality web interfaces at scale across BT's product portfolio.",
-    highlights: [
-      "Multi-theme architecture supporting BT, BT Business, and EE brands from a single component library",
-      "Design tokens published in CSS, JavaScript, JSON, and SCSS formats for maximum flexibility",
-      "React component library published as versioned npm packages under @arc-ui",
-      "Storybook-driven development with a dedicated community Storybook for extended contributions",
-      "V12 migration with comprehensive breaking-change documentation and migration guides",
-    ],
-    tech: [
-      "React",
-      "TypeScript",
-      "Design Tokens",
-      "Storybook",
-      "npm",
-      "CSS Custom Properties",
-      "SCSS",
-      "Docusaurus",
-    ],
-    liveUrl: "https://ui.digital-ent-int.bt.com/latest/docs/intro",
-    imageUrl: "/arc.png",
-  },
-];
-
-function ProjectCard({
-  project,
-  index,
-  onClick,
-}: {
-  project: Project;
-  index: number;
-  onClick: () => void;
-}) {
-  const videoRef = useRef<HTMLVideoElement>(null);
-
-  const handleMouseEnter = () => {
-    if (videoRef.current) {
-      videoRef.current.currentTime = 0;
-      videoRef.current.play();
-    }
-  };
-
-  const handleMouseLeave = () => {
-    setTimeout(() => {
-      if (videoRef.current) {
-        videoRef.current.pause();
-        videoRef.current.currentTime = 0;
-      }
-    }, 500);
-  };
-  return (
-    <motion.div
-      variants={projectItem}
-      whileHover={{ y: -4 }}
-      transition={{ duration: 0.35, ease: [0.25, 0.1, 0.25, 1] }}
-      className="group block cursor-pointer"
-      onClick={onClick}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-    >
-      {/* Thumbnail */}
-      <div
-        className="relative w-full overflow-hidden rounded-sm mb-3 border border-white/[0.08]
-        transition-colors duration-500 group-hover:border-white/[0.18]"
-        style={{ aspectRatio: "16/9" }}
-      >
-        {/* Placeholder — always visible, fades out on hover when video exists */}
-        {project.imageUrl ? (
-          <img
-            src={project.imageUrl}
-            alt={project.title}
-            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ease-out
-            ${project.videoUrl ? "group-hover:opacity-0 group-hover:delay-500" : ""}`}
-          />
-        ) : (
-          <div
-            className={`absolute inset-0 bg-white/[0.03] flex items-center justify-center transition-opacity duration-500 ease-out
-            ${project.videoUrl ? "group-hover:opacity-0 group-hover:delay-500" : ""}`}
-          >
-            {project.logoText && (
-              <AskNormaLogo
-                className="w-[55%] text-white/70"
-              />
-            )}
-          </div>
-        )}
-
-        {/* Video — hidden until hover */}
-        {project.videoUrl && (
-          <video
-            ref={videoRef}
-            src={project.videoUrl}
-            muted
-            loop
-            playsInline
-            className="absolute inset-0 w-full h-full object-cover
-            opacity-0 transition-opacity duration-500 ease-out
-            group-hover:opacity-100 group-hover:delay-500 "
-          />
-        )}
-
-        {/* Overlay scrim */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
-
-        {/* Corner index */}
-        <span
-          className="absolute top-4 left-4 text-[10px] tracking-[0.3em] uppercase text-white/20
-          transition-opacity duration-300 group-hover:text-white/50 z-10"
-        >
-          {String(index + 1).padStart(2, "0")}
-        </span>
-
-        {/* Hover arrow */}
-        <div
-          className="absolute bottom-4 right-4 opacity-0 translate-y-1
-          group-hover:opacity-100 group-hover:translate-y-0
-          transition-all duration-300 ease-out z-10"
-        >
-          <div
-            className="flex items-center justify-center w-8 h-8 rounded-full
-            bg-white/10 border border-white/20 backdrop-blur-sm"
-          >
-            <ArrowUpRight className="size-3.5 text-white" />
-          </div>
-        </div>
-      </div>
-
-      {/* Card footer */}
-      <div className="flex items-center justify-between px-0.5">
-        <h3
-          className="text-[15px] font-[400] text-white/80 tracking-[-0.01em]
-          transition-colors duration-300 group-hover:text-white"
-        >
-          {project.title}
-        </h3>
-        <ArrowUpRight
-          className="size-3.5 text-white/20 -translate-x-1 opacity-0
-          group-hover:opacity-100 group-hover:translate-x-0
-          transition-all duration-300 ease-out"
-        />
-      </div>
-    </motion.div>
-  );
+class SceneBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
+  state = { failed: false };
+  static getDerivedStateFromError() { return { failed: true }; }
+  render() {
+    return this.state.failed ? <div className="scene-fallback"><ChefHat size={64} strokeWidth={1} /><p>A little code. A little cooking.<br />Something good is on the way.</p></div> : this.props.children;
+  }
 }
 
 function App() {
-  const [selectedProject, setSelectedProject] = useState<number | null>(null);
-  const sentinelRef = useRef<HTMLDivElement>(null);
-  const isFooterRevealed = useInView(sentinelRef, {
-    once: true,
-    margin: "0px",
-  });
+  const [activity, setActivity] = useState<Activity>('coding');
+  const [reducedMotion, setReducedMotion] = useState(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  const [paused, setPaused] = useState(reducedMotion);
+  const [cycle, setCycle] = useState(0);
+
+  useEffect(() => {
+    const preference = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const update = () => { setReducedMotion(preference.matches); if (preference.matches) setPaused(true); };
+    preference.addEventListener('change', update);
+    return () => preference.removeEventListener('change', update);
+  }, []);
+
+  useEffect(() => {
+    if (paused) return;
+    let timer: ReturnType<typeof setTimeout>;
+    const schedule = () => { clearTimeout(timer); if (!document.hidden) timer = setTimeout(() => setActivity(value => value === 'coding' ? 'cooking' : 'coding'), CYCLE_LENGTH); };
+    schedule();
+    document.addEventListener('visibilitychange', schedule);
+    return () => { clearTimeout(timer); document.removeEventListener('visibilitychange', schedule); };
+  }, [activity, paused, cycle]);
+
+  const changeActivity = (next: Activity) => { setActivity(next); setCycle(value => value + 1); };
 
   return (
-    <>
-      {/* ── Footer (fixed, sits behind page content) ── */}
-      <footer
-        className="fixed bottom-0 left-0 right-0 z-0 bg-[#f0ede8] px-10 md:px-16 lg:px-20 pt-14 pb-10"
-        style={{ height: "22rem" }}
-      >
-        <div className="max-w-[1440px] mx-auto w-full h-full flex flex-col justify-between">
-          <motion.div
-            className="flex flex-col gap-4"
-            variants={container}
-            initial="hidden"
-            animate={isFooterRevealed ? "show" : "hidden"}
-          >
-            <motion.h2
-              variants={item}
-              className="text-[clamp(2.5rem,6vw,5rem)] font-[500] text-[#1a1a1a] tracking-[-0.03em] leading-[0.92]"
-            >
-              Ready to work?
-            </motion.h2>
-            <motion.a
-              variants={item}
-              href="mailto:abuchohan@hotmail.co.uk"
-              className="group inline-flex items-center gap-2 text-[clamp(1.5rem,3vw,2.5rem)] font-[500] tracking-[-0.02em] text-[#1a1a1a]/50 hover:text-[#1a1a1a] transition-colors duration-300 leading-none"
-            >
-              abuchohan@hotmail.co.uk
-              <ArrowUpRight className="size-6 md:size-8 transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" />
-            </motion.a>
-          </motion.div>
-          <motion.div
-            className="flex items-end justify-between"
-            variants={item}
-            initial="hidden"
-            animate={isFooterRevealed ? "show" : "hidden"}
-          >
-            <p className="text-[11px] tracking-[0.3em] uppercase text-[#1a1a1a]/35">
-              Abu Chohan
-            </p>
-            <p className="text-[11px] tracking-[0.3em] uppercase text-[#1a1a1a]/35">
-              © {new Date().getFullYear()}
-            </p>
-          </motion.div>
+    <div className="placeholder-page">
+      <header className="site-header">
+        <a className="wordmark" href="/" aria-label="Abu Chohan home"><span className="monogram">ac<span>.</span></span><span className="wordmark-name">Abu Chohan<span>Developer & occasional chef</span></span></a>
+        <a className="contact-link" href="mailto:abuchohan@hotmail.co.uk">Say hello <ArrowUpRight size={16} /></a>
+      </header>
+      <main>
+        <div className="intro">
+          <div className="construction-label"><span className="status-dot" /> A FRESH START IS ON THE MENU</div>
+          <h1>New website is<br />being <span className="headline-accent">cooked up<svg viewBox="0 0 370 17" fill="none" aria-hidden="true"><path d="M4 11C85 2 217 2 365 8M39 14C129 7 249 7 329 12" stroke="currentColor" strokeWidth="3" strokeLinecap="round" /></svg></span><span className="headline-period">.</span></h1>
+          <p>A little coding. A little cooking. Something good takes time.<br className="desktop-break" /> Make yourself at home while I put the finishing touches on.</p>
         </div>
-      </footer>
-
-      {/* ── Page content (scrolls over footer) ── */}
-      <div className="relative z-10 dark bg-[#080808]">
-        {/* ── Hero ── */}
-        <section className="relative w-full h-screen bg-[#080808] overflow-hidden">
-          <div className="absolute inset-0">
-            <Silk
-              speed={4.7}
-              scale={1.4}
-              color="#002ee6"
-              noiseIntensity={1.9}
-              rotation={2}
-            />
-          </div>
-
-          {/* Scrim fade to projects section */}
-          <div
-            className="absolute bottom-0 left-0 right-0 h-64 pointer-events-none z-20"
-            style={{
-              background:
-                "linear-gradient(to bottom, transparent 0%, #080808 100%)",
-            }}
-          />
-
-          <motion.div
-            className="relative z-30 flex flex-col justify-end h-full px-10 md:px-16 lg:px-20 pb-12 md:pb-16"
-            variants={container}
-            initial="hidden"
-            animate="show"
-          >
-            <motion.div variants={item} className="mb-6">
-              <span className="inline-flex items-center gap-2 text-[11px] tracking-[0.35em] uppercase text-white/40">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400/70" />
-                Available for work
-              </span>
-            </motion.div>
-
-            <motion.h1
-              variants={item}
-              className="text-[clamp(5rem,12vw,13rem)] font-[500] text-white tracking-[-0.03em] leading-[0.92] select-none"
-            >
-              Abu
-            </motion.h1>
-            <motion.h1
-              variants={item}
-              className="text-[clamp(5rem,12vw,13rem)] font-[500] text-white tracking-[-0.03em] leading-[0.92] select-none mb-6"
-            >
-              Chohan
-            </motion.h1>
-
-            <motion.p
-              variants={item}
-              className="text-[13px] font-[250] tracking-[0.3em] uppercase text-white/45 mb-3"
-            >
-              Full Stack Developer
-            </motion.p>
-
-            <motion.p
-              variants={item}
-              className="text-[15px] md:text-[17px] font-[250] text-white/60 max-w-sm leading-relaxed mb-8"
-            >
-              There's no better time than now to be a full stack developer.
-            </motion.p>
-
-            <motion.div variants={item} className="flex items-center gap-3">
-              <Button
-                variant="outline"
-                size="lg"
-                className="border-white/20 text-white bg-transparent hover:bg-white/10 hover:text-white backdrop-blur-sm rounded-full"
-                onClick={() =>
-                  document
-                    .getElementById("projects")
-                    ?.scrollIntoView({ behavior: "smooth" })
-                }
-              >
-                View Work
-              </Button>
-              <Button
-                size="lg"
-                className="bg-white text-black hover:bg-white/90 rounded-full gap-1.5"
-                onClick={() =>
-                  window.scrollTo({
-                    top: document.body.scrollHeight,
-                    behavior: "smooth",
-                  })
-                }
-              >
-                Contact
-                <ArrowRight className="size-3.5" />
-              </Button>
-            </motion.div>
-          </motion.div>
+        <section className="room-section" aria-label="An isometric room with Abu alternating between coding at his desk and cooking at the stove">
+          <div className="scene-decoration decoration-left" aria-hidden="true"><span>THE WORK IN PROGRESS</span><svg viewBox="0 0 58 66" fill="none"><path d="M5 4C3 26 22 39 48 42M38 30L50 43L35 49" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg></div>
+          <div className="scene-decoration decoration-right" aria-hidden="true"><span>100% HOMEMADE</span><svg width="26" height="26" viewBox="0 0 26 26" fill="none"><path d="M13 2v22M2 13h22M5 5l16 16M5 21L21 5" stroke="currentColor" strokeWidth="1.5" /></svg></div>
+          <div className="room-canvas"><SceneBoundary><Suspense fallback={<div className="scene-loading"><span className="status-dot" /> Setting the table…</div>}><CookRoom activity={activity} paused={paused} reducedMotion={reducedMotion} /></Suspense></SceneBoundary></div>
+          <div className="room-caption" aria-live="polite"><span className="status-dot" /><span>{activity === 'coding' ? 'Turning coffee into code' : 'Letting the ideas simmer'}</span><span className="caption-ellipsis" aria-hidden="true">...</span></div>
         </section>
-
-        {/* ── Projects ── */}
-        <section
-          id="projects"
-          className="bg-[#080808] px-10 md:px-16 lg:px-20 pt-24 pb-32"
-        >
-          <div className="max-w-[1440px] mx-auto w-full">
-            {/* Section header */}
-            <motion.div
-              className="flex items-end justify-between mb-14"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-80px" }}
-              transition={{ duration: 0.7, ease: [0.25, 0.1, 0.25, 1] }}
-            >
-              <div>
-                <p className="text-[11px] tracking-[0.35em] uppercase text-white/30 mb-3">
-                  Selected Work
-                </p>
-                <h2 className="text-[2.5rem] md:text-[3.5rem] font-[500] text-white tracking-[-0.03em] leading-[0.92]">
-                  Projects
-                </h2>
-              </div>
-              <p className="text-[12px] tracking-[0.25em] uppercase text-white/25 hidden md:block">
-                {projects.length} works
-              </p>
-            </motion.div>
-
-            {/* Cards grid */}
-            <motion.div
-              className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5"
-              variants={projectsContainer}
-              initial="hidden"
-              whileInView="show"
-              viewport={{ once: true, margin: "-60px" }}
-            >
-              {projects.map((project, i) => (
-                <ProjectCard
-                  key={project.title}
-                  project={project}
-                  index={i}
-                  onClick={() => setSelectedProject(i)}
-                />
-              ))}
-            </motion.div>
+        <div className="activity-controls">
+          <div className="activity-switch" role="group" aria-label="Choose what Abu is doing">
+            <button className={activity === 'coding' ? 'activity-button active' : 'activity-button'} aria-pressed={activity === 'coding'} onClick={() => changeActivity('coding')}><Code2 size={17} /> Coding <span className="button-indicator" /></button>
+            <button className={activity === 'cooking' ? 'activity-button active' : 'activity-button'} aria-pressed={activity === 'cooking'} onClick={() => changeActivity('cooking')}><ChefHat size={17} /> Cooking <span className="button-indicator" /></button>
           </div>
-        </section>
-      </div>
-
-      {/* Transparent spacer — creates scroll depth to reveal the fixed footer.
-          The footer (z-0) shows through this because it has no background. */}
-      <div ref={sentinelRef} className="h-[22rem]" />
-
-      {/* Project modal */}
-      <AnimatePresence>
-        {selectedProject !== null && (
-          <ProjectModal
-            key={selectedProject}
-            project={projects[selectedProject]}
-            index={selectedProject}
-            onClose={() => setSelectedProject(null)}
-          />
-        )}
-      </AnimatePresence>
-    </>
+          <button className="pause-button" onClick={() => setPaused(value => !value)} aria-label={paused ? 'Play animation and automatic activity switching' : 'Pause animation and automatic activity switching'} title={paused ? 'Play animation' : 'Pause animation'}>{paused ? <Play size={15} /> : <Pause size={15} />}</button>
+        </div>
+        <p className="interaction-hint">{paused ? 'Taking a breather. Pick an activity to explore.' : 'Switch it up, or just watch me do my thing.'}</p>
+      </main>
+      <footer className="site-footer"><span>Good things are worth the wait.</span><div><a href="https://github.com/abuchohan" target="_blank" rel="noreferrer"><Github size={15} /> GitHub <ArrowUpRight size={13} /></a><span className="footer-divider" /><span>© {new Date().getFullYear()} Abu Chohan</span></div></footer>
+    </div>
   );
 }
-
 export default App;
